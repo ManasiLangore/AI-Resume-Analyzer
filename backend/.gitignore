@@ -1,0 +1,35 @@
+# Compiled Java Class files
+*.class
+
+# Log files
+*.log
+
+# Blueprints / Package outputs
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.nextDevelopmentVersion
+pom.xml.release
+pom.xml.order
+release.properties
+pom.xml.versionsBackup
+
+# Maven wrapper items
+.mvn/wrapper/maven-wrapper.jar
+
+# Crash logs
+hs_err_pid*
+
+# Local Database & API Configurations (CRITICAL: Protects database credentials)
+backend/src/main/resources/application-local.properties
+
+# System / IDE clutter inside backend folder
+.DS_Store
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.factorypath
