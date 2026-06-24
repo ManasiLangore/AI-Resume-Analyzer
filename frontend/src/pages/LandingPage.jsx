@@ -4,18 +4,13 @@ import {
   ArrowRight, UploadCloud, Users, Sparkles, Brain, Star, 
   Mail, Menu, X 
 } from 'lucide-react';
+import {Link} from "react-router-dom";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated] = useState(false);
 
-  const handleCTAClick = () => {
-    if (isAuthenticated) {
-      alert("Redirecting to your Dashboard!");
-    } else {
-      alert("Redirecting to Login/Signup page!");
-    }
-  };
+  
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900 scroll-smooth">
@@ -37,10 +32,14 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Home</a>
               <a href="#features" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Features</a>
-              <button onClick={handleCTAClick} className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Login</button>
-              <button onClick={handleCTAClick} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer">
-                Sign Up
-              </button>
+              <Link to={"/login"} > 
+              <button className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Login</button>
+              </Link>
+              <Link to="/register">
+                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer">
+                  Sign Up
+                </button>
+              </Link>
             </div>
 
             {/* Mobile Hamburger Toggle */}
@@ -57,8 +56,8 @@ export default function LandingPage() {
           <div className="md:hidden bg-white border-b border-slate-100 px-4 pt-2 pb-4 space-y-3 shadow-lg">
             <a href="#" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-slate-600 rounded-lg hover:bg-slate-50">Home</a>
             <a href="#features" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-base font-medium text-slate-600 rounded-lg hover:bg-slate-50">Features</a>
-            <button onClick={() => { setIsMenuOpen(false); handleCTAClick(); }} className="w-full text-left block px-3 py-2 text-base font-medium text-slate-600 rounded-lg hover:bg-slate-50">Login</button>
-            <button onClick={() => { setIsMenuOpen(false); handleCTAClick(); }} className="w-full text-center bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold shadow-xs">
+            <button onClick={() => { setIsMenuOpen(false);}} className="w-full text-left block px-3 py-2 text-base font-medium text-slate-600 rounded-lg hover:bg-slate-50">Login</button>
+            <button onClick={() => { setIsMenuOpen(false);}} className="w-full text-center bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-base font-semibold shadow-xs">
               Sign Up
             </button>
           </div>
@@ -82,9 +81,11 @@ export default function LandingPage() {
               Get ATS scores, identify missing skills, receive AI-driven recommendations, and improve your chances of landing interviews.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
-              <button onClick={handleCTAClick} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 group cursor-pointer">
-                Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <Link to="/register">
+                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 group cursor-pointer">
+                 Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
               <a href="#upload" className="bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 px-6 py-3.5 rounded-xl font-bold transition-all shadow-xs flex items-center gap-2">
                 <UploadCloud className="w-5 h-5 text-slate-500" /> Upload Resume
               </a>
@@ -240,7 +241,7 @@ export default function LandingPage() {
               Join thousands of job seekers using AI to optimize their resumes and increase interview opportunities.
             </p>
             <div className="pt-4">
-              <button onClick={handleCTAClick} className="bg-white hover:bg-slate-50 text-indigo-700 font-extrabold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 group text-base cursor-pointer">
+              <button  className="bg-white hover:bg-slate-50 text-indigo-700 font-extrabold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 group text-base cursor-pointer">
                 Get Started Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -269,8 +270,8 @@ export default function LandingPage() {
             <ul className="space-y-2 text-sm">
               <li><a href="#" className="hover:text-indigo-400 transition-colors">Home</a></li>
               <li><a href="#features" className="hover:text-indigo-400 transition-colors">Features</a></li>
-              <li><button onClick={handleCTAClick} className="hover:text-indigo-400 transition-colors cursor-pointer">Login</button></li>
-              <li><button onClick={handleCTAClick} className="hover:text-indigo-400 transition-colors cursor-pointer">Sign Up</button></li>
+              <li><button  className="hover:text-indigo-400 transition-colors cursor-pointer">Login</button></li>
+              <li><button  className="hover:text-indigo-400 transition-colors cursor-pointer">Sign Up</button></li>
             </ul>
           </div>
 
