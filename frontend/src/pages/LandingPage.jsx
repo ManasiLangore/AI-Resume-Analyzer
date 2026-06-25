@@ -32,7 +32,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Home</a>
               <a href="#features" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Features</a>
-              <Link to={"/login"} > 
+              <Link to="/login" > 
               <button className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Login</button>
               </Link>
               <Link to="/register">
@@ -241,9 +241,11 @@ export default function LandingPage() {
               Join thousands of job seekers using AI to optimize their resumes and increase interview opportunities.
             </p>
             <div className="pt-4">
-              <button  className="bg-white hover:bg-slate-50 text-indigo-700 font-extrabold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 group text-base cursor-pointer">
-                Get Started Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <Link to="/register">
+                <button  className="bg-white hover:bg-slate-50 text-indigo-700 font-extrabold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 group text-base cursor-pointer">
+                  Get Started Now <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
             </div>
           </div>
         </div>

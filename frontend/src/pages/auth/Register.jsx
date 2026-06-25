@@ -4,6 +4,7 @@ import {
   ArrowRight, Brain, Sparkles, ChevronRight, Briefcase 
 } from 'lucide-react';
 import axios from 'axios';
+import {Link} from "react-router-dom";
 
 
 export default function Register() {
@@ -159,7 +160,9 @@ export default function Register() {
             <div className='text-center pt-2 border-t border-slate-100'>
                 <p className='text-sm text-slate-500'>
                     Already have an account?{' '}
-                    <a href='#' className='text-indigo-600 font-bold hover:underline'>Sign In</a>
+                    <Link to="/login" className='text-indigo-600 font-bold hover:underline'>
+                        Sign In
+                    </Link>
                 </p>
             </div>
 
