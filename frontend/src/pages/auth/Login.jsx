@@ -89,13 +89,15 @@ export default function Login() {
             </div>
           </div>
           {/* Submit Button */}
-          <button
+          <Link
+            to={"/dashboard"}
             type='submit'
             disabled={loading}
             className='w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-2.5 rounded-xl text-sm shadow-sm transition-all mt-2 cursor-pointer flex items-center justify-center'
           >
             {loading ? "Signing In..." : "Sign In"}
-          </button>
+          
+          </Link>
         </form>
 
         <div className='text-center pt-2 border-t border-slate-100'>

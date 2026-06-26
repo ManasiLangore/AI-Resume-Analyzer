@@ -7,6 +7,7 @@ import './App.css'
 import LandingPage from './pages/LandingPage'
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -19,6 +20,8 @@ function App() {
 
         <Route path="/register" element={<Register></Register>}></Route>
         <Route path="/login" element={<Login></Login>}></Route>
+
+        <Route path="/dashboard" element={<Dashboard></Dashboard>}></Route>
       </Routes>  
     </BrowserRouter>
   )
