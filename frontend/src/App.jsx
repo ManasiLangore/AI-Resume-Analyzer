@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage'
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard";
+import UploadResume from "./pages/UploadResume";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,6 +23,8 @@ function App() {
         <Route path="/login" element={<Login></Login>}></Route>
 
         <Route path="/dashboard" element={<Dashboard></Dashboard>}></Route>
+
+        <Route path="/uploadresume" element={<UploadResume></UploadResume>}></Route>
       </Routes>  
     </BrowserRouter>
   )

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Brain } from 'lucide-react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
 
@@ -13,6 +14,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleChange = (e) =>{
     setFormData({
       ...formData, [e.target.name]: e.target.value
@@ -21,12 +24,21 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.email || !formData.password) {
+      alert("Please fill in all fields!");
+      return;
+    }
+
     setLoading(true);
 
     try{
       //Send login data to Spring boot
       const res = await axios.post('http://localhost:8080/api/auth/login', formData);
       alert(res.data);
+
+      localStorage.setItem("isAuthenticated", "true");
+      navigate('/dashboard')
     }
     catch(error){
       console.error("Login Error:", error);
@@ -89,15 +101,14 @@ export default function Login() {
             </div>
           </div>
           {/* Submit Button */}
-          <Link
-            to={"/dashboard"}
+          <button
             type='submit'
             disabled={loading}
             className='w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-2.5 rounded-xl text-sm shadow-sm transition-all mt-2 cursor-pointer flex items-center justify-center'
           >
             {loading ? "Signing In..." : "Sign In"}
           
-          </Link>
+          </button>
         </form>
 
         <div className='text-center pt-2 border-t border-slate-100'>

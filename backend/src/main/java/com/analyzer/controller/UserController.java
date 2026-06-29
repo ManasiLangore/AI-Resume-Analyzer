@@ -13,7 +13,7 @@ import com.analyzer.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 public class UserController {
     
     @Autowired

@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Brain, LayoutDashboard, FileText, Settings, 
   LogOut, Menu, X, User, Bell, UploadCloud 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import UploadResume from './UploadResume';
 
 export default function UserDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
+
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -14,6 +18,18 @@ export default function UserDashboard() {
     { name: 'My Resumes', icon: <FileText className="w-5 h-5" /> },
     { name: 'Settings', icon: <Settings className="w-5 h-5" /> },
   ];
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isAuthenticated");
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    navigate('login') 
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex w-full">
@@ -59,6 +75,7 @@ export default function UserDashboard() {
 
         <button 
           onClick={() => alert("Logging out...")}
+          onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
         >
           <LogOut className="w-5 h-5" />
@@ -101,7 +118,7 @@ export default function UserDashboard() {
         {/* 📊 MAIN CONTENT DISPLAY AREA (Stretches fully across the viewport) */}
         <main className="p-6 lg:p-8 flex-1 w-full box-border">
           {activeTab === 'Dashboard' && <DashboardHome viewSetter={setActiveTab} />}
-          {activeTab === 'Analyze Resume' && <AnalyzeResumeView />}
+          {activeTab === 'Analyze Resume' && <UploadResume/>}
           {activeTab === 'My Resumes' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">List of uploaded files placeholder view.</div>}
           {activeTab === 'Settings' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">Account settings config panel placeholder view.</div>}
         </main>
@@ -145,29 +162,6 @@ function DashboardHome({ viewSetter }) {
             <p className={`text-3xl font-black ${card.color} mt-2`}>{card.value}</p>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-// 📦 SUB-COMPONENT 2: FULL-WIDTH RESUME UPLOADER
-function AnalyzeResumeView() {
-  return (
-    <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
-      <div>
-        <h3 className="text-lg font-bold text-slate-900">Upload Your Resume</h3>
-        <p className="text-sm text-slate-500">Supported formats: PDF, DOCX (Max 5MB)</p>
-      </div>
-
-      {/* Dropzone stretches completely across the container */}
-      <div className="w-full border-2 border-dashed border-slate-200 hover:border-indigo-500 bg-slate-50/50 hover:bg-indigo-50/20 rounded-2xl p-16 flex flex-col items-center text-center gap-4 transition-colors cursor-pointer group">
-        <div className="bg-white p-4 rounded-xl border border-slate-100 text-slate-400 group-hover:text-indigo-600 group-hover:scale-105 transition-all shadow-xs">
-          <UploadCloud className="w-10 h-10" />
-        </div>
-        <div>
-          <p className="text-base font-bold text-slate-700">Click to select file or drag it here</p>
-          <p className="text-sm text-slate-400 mt-1">We will evaluate technical keywords and parsing configurations</p>
-        </div>
       </div>
     </div>
   );
