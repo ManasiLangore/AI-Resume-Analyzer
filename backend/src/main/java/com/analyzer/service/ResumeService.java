@@ -18,9 +18,13 @@ public class ResumeService {
     @Autowired
     private ResumeRepository resumeRepo;
 
+    @Autowired
+    private FileTextExtractor fileTextExtractor;
+
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
 
-    public Resume saveResume(MultipartFile file) throws IOException{
+    public Resume saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
+        // Ensure folder directory infrastructure setup matches target specifications
         File directory = new File(UPLOAD_DIR);
         if(!directory.exists()){
             directory.mkdirs();
@@ -29,8 +33,18 @@ public class ResumeService {
         String uniqueFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9.-]","_");
         Path targetPath = Paths.get(UPLOAD_DIR + File.separator + uniqueFileName);
 
+        // Write binary payload to local disk
         Files.write(targetPath, file.getBytes());
 
+        // EXTRACT PLAIN TEXT FROM THE SAVED RESUME FILE!
+        String extractedResumeText = fileTextExtractor.extractText(targetPath.toString(),  file.getContentType());
+
+        // For tracking/debugging purposes, let's print a snippet of what was read to the terminal console log
+        System.out.println("=== EXTRACTED RESUME TEXT SNIPPET ===");
+        System.out.println(extractedResumeText.length() > 500 ? extractedResumeText.substring(0, 500) + "..." : extractedResumeText);
+        System.out.println("=====================================");
+
+        // Record file metadata properties inside the DB engine
         Resume resumeRecord = new Resume(
             uniqueFileName,
             file.getContentType(),
