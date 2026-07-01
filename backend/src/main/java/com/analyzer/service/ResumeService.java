@@ -21,9 +21,12 @@ public class ResumeService {
     @Autowired
     private FileTextExtractor fileTextExtractor;
 
+    @Autowired
+    private AnalysisService analysisService;
+
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
 
-    public Resume saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
+    public AnalysisResult saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
         // Ensure folder directory infrastructure setup matches target specifications
         File directory = new File(UPLOAD_DIR);
         if(!directory.exists()){
@@ -36,7 +39,7 @@ public class ResumeService {
         // Write binary payload to local disk
         Files.write(targetPath, file.getBytes());
 
-        // EXTRACT PLAIN TEXT FROM THE SAVED RESUME FILE!
+        // Extract plain text from the saved resume file
         String extractedResumeText = fileTextExtractor.extractText(targetPath.toString(),  file.getContentType());
 
         // For tracking/debugging purposes, let's print a snippet of what was read to the terminal console log
@@ -52,6 +55,9 @@ public class ResumeService {
             LocalDateTime.now()
         );
 
-        return resumeRepo.save(resumeRecord);
+        resumeRepo.save(resumeRecord);
+
+        //Pass text blocks to calculate analytics instantly
+        return analysisService.analyzeResumeMatch(extractedResumeText, jobDescription);
     }
 }

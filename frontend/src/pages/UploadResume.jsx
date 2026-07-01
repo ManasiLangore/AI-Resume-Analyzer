@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { UploadCloud } from 'lucide-react';
+
 import axios from 'axios';
+import { UploadCloud, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 
 export default function UploadResume() {
 
@@ -8,6 +9,8 @@ export default function UploadResume() {
     const[uploading, setUploading] = useState(false);
     const [jobDescription, setJobDescription] = useState("");
     const [message, setMessage] = useState("");
+
+    const [analysisResult, setAnalysisResult] = useState(null);
 
     const handleFileChange = (e) =>{
         const selectedFile = e.target.files[0];
@@ -27,6 +30,7 @@ export default function UploadResume() {
 
         setUploading(true);
         setMessage("");
+        setAnalysisResult(null);
 
         const formData = new FormData();
         formData.append("file", file);
@@ -39,7 +43,7 @@ export default function UploadResume() {
                 },
             });
 
-            setMessage(`✅ ${response.data}`);
+            setAnalysisResult(response.data);
             setFile(null); 
             setJobDescription("");
         } 
@@ -99,10 +103,8 @@ export default function UploadResume() {
         </div>
 
         {message && (
-          <div className={`p-4 rounded-xl text-sm font-semibold tracking-wide border ${
-            message.startsWith("✅") ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
-          }`}>
-            {message}
+          <div className="p-4 rounded-xl text-sm font-semibold border bg-rose-50 border-rose-200 text-rose-800">
+            ❌ {message}
           </div>
         )}
 
@@ -114,6 +116,75 @@ export default function UploadResume() {
           {uploading ? "Analyzing Profile Match..." : "Upload & Analyze Match"}
         </button>
       </form>
+
+      {/* 📊 SECTION B: VISUAL RESULTS CARD DISPLAY PANEL */}
+      {/* This section mounts dynamically only when an analysisResult is present */}
+      {analysisResult && (
+        <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-4">
+            <BarChart3 className="w-5 h-5 text-indigo-600" />
+            <h4 className="text-base font-bold text-slate-900">ATS Match Analysis Results</h4>
+          </div>
+
+          {/* Score Circle Panel Layout */}
+          <div className="flex flex-col sm:flex-row items-center gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-white border-4 border-indigo-600 shadow-xs shrink-0">
+              <span className="text-2xl font-black text-slate-800">{analysisResult.matchPercentage}%</span>
+            </div>
+            <div className="text-center sm:text-left space-y-1">
+              <p className="text-base font-bold text-slate-800">Calculated Profile Score</p>
+              <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                {analysisResult.matchPercentage >= 70 
+                  ? "Excellent keyword alignment! Your profile matches standard automated screening criteria for this role."
+                  : "Consider optimizing your baseline experience summaries to include more missing technical terms to pass automated filters."}
+              </p>
+            </div>
+          </div>
+
+          {/* Keywords Columns Breakout Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Matched Skills Column */}
+            <div className="border border-slate-200/80 rounded-2xl p-5 space-y-3 bg-white">
+              <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm uppercase tracking-wider">
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                Matched Technical Keywords ({analysisResult.matchedKeywords.length})
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {analysisResult.matchedKeywords.length > 0 ? (
+                  analysisResult.matchedKeywords.map((skill, index) => (
+                    <span key={index} className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-lg uppercase">
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-slate-400 italic">No exact technical matches identified.</span>
+                )}
+              </div>
+            </div>
+
+            {/* Missing Skills Column */}
+            <div className="border border-slate-200/80 rounded-2xl p-5 space-y-3 bg-white">
+              <div className="flex items-center gap-2 text-amber-700 font-bold text-sm uppercase tracking-wider">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                Missing Required Keywords ({analysisResult.missingKeywords.length})
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {analysisResult.missingKeywords.length > 0 ? (
+                  analysisResult.missingKeywords.map((skill, index) => (
+                    <span key={index} className="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold rounded-lg uppercase">
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-emerald-600 italic font-medium">Perfect skill matrix alignment! No key terms missing.</span>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.analyzer.entity.Resume;
 import com.analyzer.service.ResumeService;
+import com.analyzer.service.AnalysisResult;
 
 @RestController
 @RequestMapping("/api/resumes")
@@ -42,15 +43,10 @@ public class ResumeController {
 
         try {
             // Hand off execution responsibility to Service business layers
-            Resume savedMetaRecord = resumeService.saveAndProcessResume(file, jobDescription);
+            AnalysisResult metricsResult = resumeService.saveAndProcessResume(file, jobDescription);
             
-            // Temporarily printing the job description to the console to make sure it arrives cleanly!
-            System.out.println("--- RECEIVED JOB DESCRIPTION FOR RESUME ID: " + savedMetaRecord.getId() + " ---");
-            System.out.println(jobDescription);
-            System.out.println("-------------------------------------------------------------------------");
-        
-            // Return status confirmation payload
-            return ResponseEntity.ok("File uploaded cleanly and cataloged with database reference ID: " + savedMetaRecord.getId());
+            // Return the calculation dataset payload as a JSON object directly to React
+            return ResponseEntity.ok(metricsResult);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
