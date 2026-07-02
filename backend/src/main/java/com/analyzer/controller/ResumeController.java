@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.analyzer.entity.Resume;
 import com.analyzer.service.ResumeService;
-import com.analyzer.service.AnalysisResult;
+// import com.analyzer.service.AnalysisResult;
+import com.analyzer.service.AiAnalysisResponse;
+
 
 @RestController
 @RequestMapping("/api/resumes")
@@ -43,10 +45,12 @@ public class ResumeController {
 
         try {
             // Hand off execution responsibility to Service business layers
-            AnalysisResult metricsResult = resumeService.saveAndProcessResume(file, jobDescription);
-            
+            //AnalysisResult metricsResult = resumeService.saveAndProcessResume(file, jobDescription);
+            AiAnalysisResponse aiMetrics = resumeService.saveAndProcessResume(file, jobDescription);
+        
             // Return the calculation dataset payload as a JSON object directly to React
-            return ResponseEntity.ok(metricsResult);
+            // return ResponseEntity.ok(metricsResult);
+            return ResponseEntity.ok(aiMetrics);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

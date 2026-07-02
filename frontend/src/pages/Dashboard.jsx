@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Brain, LayoutDashboard, FileText, Settings, 
-  LogOut, Menu, X, User, Bell, UploadCloud 
+  LogOut, Menu, X, Bell, UploadCloud 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UploadResume from './UploadResume';
+import AnalysisResult from './AnalysisResult';
 
-export default function UserDashboard() {
+export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
-
+  const [analysisResult, setAnalysisResult] = useState(null);
   const navigate = useNavigate();
 
   const navItems = [
@@ -28,8 +29,10 @@ export default function UserDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
-    navigate('login') 
+    navigate('/login'); 
   };
+
+  console.log("Current Parent Analysis Result State:", analysisResult);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex w-full">
@@ -74,7 +77,6 @@ export default function UserDashboard() {
         </div>
 
         <button 
-          onClick={() => alert("Logging out...")}
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
         >
@@ -83,7 +85,7 @@ export default function UserDashboard() {
         </button>
       </aside>
 
-      {/* 🖥️ RIGHT CONTENT CONTAINER (Utilizes 100% available width) */}
+      {/* 🖥_ RIGHT CONTENT CONTAINER */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         
         {/* 🔝 TOP NAVIGATION BAR */}
@@ -115,10 +117,19 @@ export default function UserDashboard() {
           </div>
         </header>
 
-        {/* 📊 MAIN CONTENT DISPLAY AREA (Stretches fully across the viewport) */}
-        <main className="p-6 lg:p-8 flex-1 w-full box-border">
+        {/* 📊 MAIN CONTENT DISPLAY AREA */}
+        <main className="p-6 lg:p-8 flex-1 w-full box-border space-y-6">
           {activeTab === 'Dashboard' && <DashboardHome viewSetter={setActiveTab} />}
-          {activeTab === 'Analyze Resume' && <UploadResume/>}
+          
+          {activeTab === 'Analyze Resume' && (
+            <UploadResume onAnalysisComplete={setAnalysisResult} />
+          )}
+
+          {/* Fixed data state evaluation logic */}
+          {activeTab === 'Analyze Resume' && analysisResult && (
+            <AnalysisResult result={analysisResult} />
+          )}
+
           {activeTab === 'My Resumes' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">List of uploaded files placeholder view.</div>}
           {activeTab === 'Settings' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">Account settings config panel placeholder view.</div>}
         </main>
@@ -128,11 +139,10 @@ export default function UserDashboard() {
   );
 }
 
-// 📦 SUB-COMPONENT 1: FULL-WIDTH DASHBOARD HOME
+// Sub-Component embedded directly below dashboard main interface frame shell
 function DashboardHome({ viewSetter }) {
   return (
     <div className="space-y-6 w-full">
-      {/* Banner stretches 100% width */}
       <div className="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 space-y-2">
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Welcome to HireLens AI Workspace!</h2>
@@ -150,7 +160,6 @@ function DashboardHome({ viewSetter }) {
         </div>
       </div>
 
-      {/* Grid stretches 100% width */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
         {[
           { title: "Total Audits", value: "0", color: "text-indigo-600" },

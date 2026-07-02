@@ -22,11 +22,12 @@ public class ResumeService {
     private FileTextExtractor fileTextExtractor;
 
     @Autowired
-    private AnalysisService analysisService;
+    // private AnalysisService analysisService;
+    private GeminiApiService geminiApiService;
 
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
 
-    public AnalysisResult saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
+    public AiAnalysisResponse saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
         // Ensure folder directory infrastructure setup matches target specifications
         File directory = new File(UPLOAD_DIR);
         if(!directory.exists()){
@@ -58,6 +59,7 @@ public class ResumeService {
         resumeRepo.save(resumeRecord);
 
         //Pass text blocks to calculate analytics instantly
-        return analysisService.analyzeResumeMatch(extractedResumeText, jobDescription);
+        // return analysisService.analyzeResumeMatch(extractedResumeText, jobDescription);
+        return geminiApiService.getResumeAnalysis(extractedResumeText, jobDescription);
     }
 }

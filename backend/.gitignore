@@ -33,3 +33,7 @@ backend/src/main/resources/application-local.properties
 .project
 .settings/
 .factorypath
+
+
+
+.vscode/
