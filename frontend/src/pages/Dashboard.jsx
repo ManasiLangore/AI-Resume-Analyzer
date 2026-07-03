@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [analysisResult, setAnalysisResult] = useState(null);
   const navigate = useNavigate();
 
+  // Clean, static sidebar navigation
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: 'Analyze Resume', icon: <UploadCloud className="w-5 h-5" /> },
@@ -31,8 +32,6 @@ export default function Dashboard() {
     localStorage.removeItem("isAuthenticated");
     navigate('/login'); 
   };
-
-  console.log("Current Parent Analysis Result State:", analysisResult);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex w-full">
@@ -61,7 +60,12 @@ export default function Dashboard() {
             {navItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => { setActiveTab(item.name); setIsSidebarOpen(false); }}
+                onClick={() => { 
+                  setActiveTab(item.name); 
+                  setIsSidebarOpen(false); 
+                  // Reset the report view if they click away and click back to upload fresh
+                  if (item.name === 'Analyze Resume') setAnalysisResult(null);
+                }}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer
                   ${activeTab === item.name 
@@ -94,7 +98,9 @@ export default function Dashboard() {
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold text-slate-800 hidden sm:block">{activeTab}</h1>
+            <h1 className="text-lg font-bold text-slate-800 hidden sm:block">
+              {activeTab === 'Analyze Resume' && analysisResult ? 'Analysis Report' : activeTab}
+            </h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -121,13 +127,21 @@ export default function Dashboard() {
         <main className="p-6 lg:p-8 flex-1 w-full box-border space-y-6">
           {activeTab === 'Dashboard' && <DashboardHome viewSetter={setActiveTab} />}
           
+          {/* 🎯 THE DYNAMIC SWAP HAPPENS HERE */}
           {activeTab === 'Analyze Resume' && (
-            <UploadResume onAnalysisComplete={setAnalysisResult} />
-          )}
-
-          {/* Fixed data state evaluation logic */}
-          {activeTab === 'Analyze Resume' && analysisResult && (
-            <AnalysisResult result={analysisResult} />
+            !analysisResult ? (
+              <UploadResume onAnalysisComplete={setAnalysisResult} />
+            ) : (
+              <div className="space-y-4">
+                <button 
+                  onClick={() => setAnalysisResult(null)}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                >
+                  ← Upload Another Resume
+                </button>
+                <AnalysisResult result={analysisResult} />
+              </div>
+            )
           )}
 
           {activeTab === 'My Resumes' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">List of uploaded files placeholder view.</div>}
@@ -139,7 +153,6 @@ export default function Dashboard() {
   );
 }
 
-// Sub-Component embedded directly below dashboard main interface frame shell
 function DashboardHome({ viewSetter }) {
   return (
     <div className="space-y-6 w-full">

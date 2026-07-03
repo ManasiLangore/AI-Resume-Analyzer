@@ -2,7 +2,15 @@ import React from 'react';
 import { BarChart3, HelpCircle, CheckCircle, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function AnalysisResult({ result }) {
-  if (!result) return null;
+  if (!result) {
+    return (
+      <div className="w-full bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500 shadow-sm">
+        No active analysis report found. Please upload a resume first.
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
