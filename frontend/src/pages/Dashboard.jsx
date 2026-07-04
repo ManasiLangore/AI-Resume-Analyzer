@@ -6,6 +6,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import UploadResume from './UploadResume';
 import AnalysisResult from './AnalysisResult';
+import ResumeHistory from './ResumeHistory';
 
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -144,7 +145,7 @@ export default function Dashboard() {
             )
           )}
 
-          {activeTab === 'My Resumes' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">List of uploaded files placeholder view.</div>}
+          {activeTab === 'My Resumes' && <ResumeHistory></ResumeHistory>}
           {activeTab === 'Settings' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">Account settings config panel placeholder view.</div>}
         </main>
 
@@ -158,7 +159,7 @@ function DashboardHome({ viewSetter }) {
     <div className="space-y-6 w-full">
       <div className="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Welcome to HireLens AI Workspace!</h2>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Welcome to HireLens AI Workspace!</h2>
           <p className="text-slate-300 text-sm leading-relaxed max-w-2xl">
             Upload your professional background profile copy, check layout optimization variables, and discover target tracking matching scores instantly.
           </p>

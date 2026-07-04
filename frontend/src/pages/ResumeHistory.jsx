@@ -1,0 +1,127 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import AnalysisResult from './AnalysisResult';
+
+export default function ResumeHistory() {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  const fetchHistory = () => {
+    setLoading(true);
+    axios.get("http://localhost:8080/api/resumes/history")
+      .then(response => {
+        setHistory(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching rows:", err);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  // 🚀 DELETE SPECIFIC ITEM FUNCTION
+  const handleDeleteRow = (id, fileName) => {
+    // Show clean display name in the confirmation alert
+    const displayName = fileName.substring(fileName.indexOf('_') + 1);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the analysis record for "${displayName}"?`);
+    
+    if (confirmDelete) {
+      axios.delete(`http://localhost:8080/api/resumes/${id}`)
+        .then(() => {
+          // Instantly filter out the deleted item from the UI state list
+          setHistory(prevHistory => prevHistory.filter(record => record.id !== id));
+        })
+        .catch(err => {
+          console.error("Error deleting record:", err);
+          alert("Failed to delete the record. Please try again.");
+        });
+    }
+  };
+
+  if (loading) {
+    return <div className="text-sm font-semibold text-slate-500">Loading audit history logs...</div>;
+  }
+
+  if (selectedReport) {
+    return (
+      <div className="space-y-4">
+        <button 
+          onClick={() => setSelectedReport(null)}
+          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+        >
+          ← Back to History List
+        </button>
+        <AnalysisResult result={{ matchScore: selectedReport.matchScore, analysisReport: selectedReport.analysisReport }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden w-full">
+      <div className="p-6 border-b border-slate-100">
+        <h3 className="text-lg font-bold text-slate-900">Your Saved Audit Records</h3>
+        <p className="text-sm text-slate-500">Review historical match performance ratings extracted over time.</p>
+      </div>
+
+      {history.length === 0 ? (
+        <div className="p-12 text-center text-slate-400 text-sm">
+          No historical analyses found in database.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                <th className="p-4">File Name</th>
+                <th className="p-4">Date Processed</th>
+                <th className="p-4">Match Score</th>
+                <th className="p-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
+              {history.map((record) => (
+                <tr key={record.id} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="p-4 font-bold text-slate-800 max-w-xs truncate">
+                    {record.fileName.substring(record.fileName.indexOf('_') + 1)}
+                  </td>
+                  <td className="p-4 text-slate-400">
+                    {new Date(record.uploadTime).toLocaleDateString('en-IN', {
+                      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'
+                    })}
+                  </td>
+                  <td className="p-4">
+                    <span className={`px-2.5 py-1 rounded-md font-bold text-xs ${
+                      record.matchScore >= 70 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                    }`}>
+                      {record.matchScore}%
+                    </span>
+                  </td>
+                  {/* ACTIONS COLUMN WITH TWO DISTINCT OPTIONS */}
+                  <td className="p-4 text-right space-x-4">
+                    <button 
+                      onClick={() => setSelectedReport(record)}
+                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
+                    >
+                      View Report
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteRow(record.id, record.fileName)}
+                      className="text-xs font-bold text-rose-500 hover:text-rose-700 hover:underline cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}

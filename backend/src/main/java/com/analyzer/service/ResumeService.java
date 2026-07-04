@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ResumeService {
@@ -43,23 +44,50 @@ public class ResumeService {
         // Extract plain text from the saved resume file
         String extractedResumeText = fileTextExtractor.extractText(targetPath.toString(),  file.getContentType());
 
-        // For tracking/debugging purposes, let's print a snippet of what was read to the terminal console log
-        System.out.println("=== EXTRACTED RESUME TEXT SNIPPET ===");
-        System.out.println(extractedResumeText.length() > 500 ? extractedResumeText.substring(0, 500) + "..." : extractedResumeText);
-        System.out.println("=====================================");
+
+        //process matching analysis via Gemini API client
+        AiAnalysisResponse aiMetrics = geminiApiService.getResumeAnalysis(extractedResumeText, jobDescription);
+
+        //Check if the API actually succeeded before saving to MySQL
+        if (aiMetrics == null || aiMetrics.getAtsScore() == 0 && aiMetrics.getStructuralCritique().contains("error")) {
+            throw new RuntimeException("Google Gemini API is currently unavailable due to high demand. Please try again in a moment.");
+        }
+
+        // Formulate a clean combined summary text block to save into the TEXT column
+        String combinedReport = "### Structural Critique\n" + aiMetrics.getStructuralCritique() + "\n\n" +
+                               "### Matched Skills\n" + String.join(", ", aiMetrics.getMatchedSkills()) + "\n\n" +
+                               "### Missing Skills\n" + String.join(", ", aiMetrics.getMissingSkills()) + "\n\n" +
+                               "### Suggestions\n" + String.join(", ", aiMetrics.getOptimizationSuggestions());
 
         // Record file metadata properties inside the DB engine
-        Resume resumeRecord = new Resume(
-            uniqueFileName,
-            file.getContentType(),
-            targetPath.toString(),
-            LocalDateTime.now()
-        );
+        Resume resumeRecord = new Resume();
+
+        resumeRecord.setFileName(uniqueFileName);
+        resumeRecord.setFileType(file.getContentType());
+        resumeRecord.setFilePath(targetPath.toString());
+        resumeRecord.setUploadTime(LocalDateTime.now());
+        resumeRecord.setMatchScore(aiMetrics.getAtsScore());
+        resumeRecord.setAnalysisReport(combinedReport);
 
         resumeRepo.save(resumeRecord);
+        return aiMetrics;
 
         //Pass text blocks to calculate analytics instantly
         // return analysisService.analyzeResumeMatch(extractedResumeText, jobDescription);
-        return geminiApiService.getResumeAnalysis(extractedResumeText, jobDescription);
+        // return geminiApiService.getResumeAnalysis(extractedResumeText, jobDescription);
     }
+
+    // New Service support wrapper method to query historical rows
+    public List<Resume> getHistoryLogs() {
+        return resumeRepo.findAllByOrderByUploadTimeDesc();
+    }
+
+    //to delete specific record histroy
+    public boolean deleteResumeById(Long id) {
+    if (resumeRepo.existsById(id)) {
+        resumeRepo.deleteById(id);
+        return true;
+    }
+    return false;
+}
 }

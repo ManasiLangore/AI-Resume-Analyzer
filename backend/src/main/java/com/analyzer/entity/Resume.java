@@ -2,10 +2,12 @@ package com.analyzer.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,6 +21,18 @@ public class Resume {
     private String fileType;
     private String filePath;
     private LocalDateTime uploadTime;
+
+    //AI INtegration fields
+    private int matchScore;
+
+    @Column(name = "analysis_report", columnDefinition = "LONGTEXT")
+    private String analysisReport;
+
+    @PrePersist
+    protected void onCreate(){
+        this.uploadTime = LocalDateTime.now();
+    }
+
 
     public Resume() {}
 
@@ -67,6 +81,20 @@ public class Resume {
 
     public void setUploadTime(LocalDateTime uploadTime) {
         this.uploadTime = uploadTime;
+    }
+
+    public int getMatchScore() { 
+        return matchScore; 
+    }
+    public void setMatchScore(int matchScore) { 
+        this.matchScore = matchScore; 
+    }
+
+    public String getAnalysisReport() { 
+        return analysisReport; 
+    }
+    public void setAnalysisReport(String analysisReport) { 
+        this.analysisReport = analysisReport; 
     }
     
 }
