@@ -1,8 +1,10 @@
 package com.analyzer.controller;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.analyzer.entity.Resume;
 import com.analyzer.service.ResumeService;
@@ -86,4 +93,31 @@ public class ResumeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record not found.");
         }
     }
+
+    @GetMapping("/{id}/file")
+        public ResponseEntity<Resource> getOriginalResumeFile(@PathVariable Long id) {
+            try {
+                // Fetch the file metadata using your service
+                com.analyzer.entity.Resume resume = resumeService.getHistoryLogs()
+                        .stream()
+                        .filter(r -> r.getId().equals(id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("File record not found"));
+
+                Path file = Paths.get(resume.getFilePath());
+                Resource resource = new UrlResource(file.toUri());
+
+                if (resource.exists() || resource.isReadable()) {
+                    return ResponseEntity.ok()
+                            // This header tells the browser to try to open it inline (PDF/Images) rather than force downloading
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                            .contentType(MediaType.parseMediaType(resume.getFileType()))
+                            .body(resource);
+                } else {
+                    return ResponseEntity.notFound().build();
+                }
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
 }

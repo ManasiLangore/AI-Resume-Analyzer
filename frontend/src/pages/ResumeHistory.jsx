@@ -48,15 +48,44 @@ export default function ResumeHistory() {
   }
 
   if (selectedReport) {
+    // Reconstruct the response object format expected by your AnalysisResult UI component
+    const formattedResult = {
+      atsScore: selectedReport.matchScore,
+      structuralCritique: selectedReport.structuralCritique || "No structural feedback returned.",
+      matchedSkills: selectedReport.matchedSkills ? selectedReport.matchedSkills.split(', ') : [],
+      missingSkills: selectedReport.missingSkills ? selectedReport.missingSkills.split(', ') : [],
+      optimizationSuggestions: selectedReport.optimizationSuggestions ? selectedReport.optimizationSuggestions.split(', ') : []
+    };
+    
+    const originalFileName = selectedReport.fileName.substring(selectedReport.fileName.indexOf('_') + 1);
+
     return (
       <div className="space-y-4">
-        <button 
-          onClick={() => setSelectedReport(null)}
-          className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100/80 px-3 py-1.5 rounded-lg transition-all cursor-pointer"
-        >
-          ← Back to History List
-        </button>
-        <AnalysisResult result={{ matchScore: selectedReport.matchScore, analysisReport: selectedReport.analysisReport }} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <button 
+            onClick={() => setSelectedReport(null)}
+            className="text-xs font-bold text-slate-600 hover:text-slate-800 bg-white border border-slate-200 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-xs self-start"
+          >
+            ← Back to History List
+          </button>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500 font-medium truncate max-w-xs">
+              File: <strong className="text-slate-700">{originalFileName}</strong>
+            </span>
+            
+            <a 
+              href={`http://localhost:8080/api/resumes/${selectedReport.id}/file`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-1.5 rounded-lg transition-all shadow-xs inline-block text-center whitespace-nowrap"
+            >
+              View Original Document ↗
+            </a>
+          </div>
+        </div>
+        
+        <AnalysisResult result={formattedResult} />
       </div>
     );
   }

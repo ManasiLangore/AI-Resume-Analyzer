@@ -67,7 +67,10 @@ public class ResumeService {
         resumeRecord.setFilePath(targetPath.toString());
         resumeRecord.setUploadTime(LocalDateTime.now());
         resumeRecord.setMatchScore(aiMetrics.getAtsScore());
-        resumeRecord.setAnalysisReport(combinedReport);
+        resumeRecord.setStructuralCritique(aiMetrics.getStructuralCritique());
+        resumeRecord.setMatchedSkills(String.join(", ", aiMetrics.getMatchedSkills()));
+        resumeRecord.setMissingSkills(String.join(", ", aiMetrics.getMissingSkills()));
+        resumeRecord.setOptimizationSuggestions(String.join(", ", aiMetrics.getOptimizationSuggestions()));
 
         resumeRepo.save(resumeRecord);
         return aiMetrics;

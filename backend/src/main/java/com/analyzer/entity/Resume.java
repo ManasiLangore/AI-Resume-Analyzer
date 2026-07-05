@@ -24,9 +24,18 @@ public class Resume {
 
     //AI INtegration fields
     private int matchScore;
+    
+    @Column(columnDefinition = "LONGTEXT")
+    private String structuralCritique;
 
-    @Column(name = "analysis_report", columnDefinition = "LONGTEXT")
-    private String analysisReport;
+    @Column(columnDefinition = "TEXT")
+    private String matchedSkills;
+
+    @Column(columnDefinition = "TEXT")
+    private String missingSkills;
+
+    @Column(columnDefinition = "TEXT")
+    private String optimizationSuggestions;
 
     @PrePersist
     protected void onCreate(){
@@ -90,11 +99,16 @@ public class Resume {
         this.matchScore = matchScore; 
     }
 
-    public String getAnalysisReport() { 
-        return analysisReport; 
-    }
-    public void setAnalysisReport(String analysisReport) { 
-        this.analysisReport = analysisReport; 
-    }
+    public String getStructuralCritique() { return structuralCritique; }
+    public void setStructuralCritique(String structuralCritique) { this.structuralCritique = structuralCritique; }
+
+    public String getMatchedSkills() { return matchedSkills; }
+    public void setMatchedSkills(String matchedSkills) { this.matchedSkills = matchedSkills; }
+
+    public String getMissingSkills() { return missingSkills; }
+    public void setMissingSkills(String missingSkills) { this.missingSkills = missingSkills; }
+
+    public String getOptimizationSuggestions() { return optimizationSuggestions; }
+    public void setOptimizationSuggestions(String optimizationSuggestions) { this.optimizationSuggestions = optimizationSuggestions; }
     
 }
