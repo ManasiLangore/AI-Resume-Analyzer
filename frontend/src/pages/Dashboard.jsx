@@ -4,6 +4,7 @@ import {
   LogOut, Menu, X, Bell, UploadCloud 
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import UploadResume from './UploadResume';
 import AnalysisResult from './AnalysisResult';
 import ResumeHistory from './ResumeHistory';
@@ -12,15 +13,46 @@ export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [analysisResult, setAnalysisResult] = useState(null);
+  
+  // 🚀 LIVE METRICS STATE CONTAINERS
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [username, setUsername] = useState("Guest User");
+
   const navigate = useNavigate();
 
-  // Clean, static sidebar navigation
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: 'Analyze Resume', icon: <UploadCloud className="w-5 h-5" /> },
     { name: 'My Resumes', icon: <FileText className="w-5 h-5" /> },
     { name: 'Settings', icon: <Settings className="w-5 h-5" /> },
   ];
+
+  useEffect(() => {
+    const storedName = localStorage.getItem("username");
+    if (storedName) {
+      setUsername(storedName);
+    }
+  }, []);
+
+  // Fetch metrics data from database
+  const fetchDashboardData = () => {
+    axios.get("http://localhost:8080/api/resumes/history")
+      .then(response => {
+        setHistory(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching dashboard counters:", err);
+        setLoading(false);
+      });
+  };
+
+  // Run fetch whenever the active tab updates to keep counters crisp
+  useEffect(() => {
+    fetchDashboardData();
+  }, [activeTab]);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isAuthenticated");
@@ -31,8 +63,22 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("username");
     navigate('/login'); 
   };
+
+  // 📊 CALCULATE LIVE AGGREGATED METRICS
+  const totalAudits = history.length;
+
+  const averageAtsScore = totalAudits > 0
+    ? Math.round(history.reduce((sum, record) => sum + record.matchScore, 0) / totalAudits)
+    : 0;
+
+  const totalMissingKeywords = history.reduce((sum, record) => {
+    if (!record.missingSkills) return sum;
+    const skillsArray = record.missingSkills.split(', ').filter(Boolean);
+    return sum + skillsArray.length;
+  }, 0);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex w-full">
@@ -64,7 +110,6 @@ export default function Dashboard() {
                 onClick={() => { 
                   setActiveTab(item.name); 
                   setIsSidebarOpen(false); 
-                  // Reset the report view if they click away and click back to upload fresh
                   if (item.name === 'Analyze Resume') setAnalysisResult(null);
                 }}
                 className={`
@@ -114,11 +159,10 @@ export default function Dashboard() {
 
             <div className="flex items-center gap-2.5 pl-1">
               <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-bold">
-                M
+                {username.charAt(0).toUpperCase()}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-bold text-slate-800 leading-none">Manasi</p>
-                <p className="text-xs font-medium text-slate-400 mt-0.5">Premium Plan</p>
+                <p className="text-sm font-bold text-slate-800 leading-none">{username}</p>
               </div>
             </div>
           </div>
@@ -126,9 +170,15 @@ export default function Dashboard() {
 
         {/* 📊 MAIN CONTENT DISPLAY AREA */}
         <main className="p-6 lg:p-8 flex-1 w-full box-border space-y-6">
-          {activeTab === 'Dashboard' && <DashboardHome viewSetter={setActiveTab} />}
+          {activeTab === 'Dashboard' && (
+            <DashboardHome 
+              viewSetter={setActiveTab} 
+              audits={totalAudits}
+              avgScore={averageAtsScore}
+              missingCount={totalMissingKeywords}
+            />
+          )}
           
-          {/* 🎯 THE DYNAMIC SWAP HAPPENS HERE */}
           {activeTab === 'Analyze Resume' && (
             !analysisResult ? (
               <UploadResume onAnalysisComplete={setAnalysisResult} />
@@ -145,8 +195,18 @@ export default function Dashboard() {
             )
           )}
 
-          {activeTab === 'My Resumes' && <ResumeHistory></ResumeHistory>}
-          {activeTab === 'Settings' && <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">Account settings config panel placeholder view.</div>}
+          {activeTab === 'My Resumes' && (
+            <ResumeHistory 
+              initialHistory={history} 
+              onRefresh={fetchDashboardData} 
+            />
+          )}
+
+          {activeTab === 'Settings' && (
+            <div className="w-full p-6 bg-white border border-slate-200 rounded-2xl text-slate-500 shadow-xs">
+              Account settings config panel placeholder view.
+            </div>
+          )}
         </main>
 
       </div>
@@ -154,7 +214,8 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHome({ viewSetter }) {
+//RECEIVES DYNAMIC VALUE PROPERTIES FROM THE PARENT CONTAINER AGGREGATORS
+function DashboardHome({ viewSetter, audits, avgScore, missingCount }) {
   return (
     <div className="space-y-6 w-full">
       <div className="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
@@ -175,16 +236,20 @@ function DashboardHome({ viewSetter }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
-        {[
-          { title: "Total Audits", value: "0", color: "text-indigo-600" },
-          { title: "Average ATS Score", value: "0%", color: "text-emerald-600" },
-          { title: "Missing Technical Keywords", value: "0", color: "text-amber-500" }
-        ].map((card, index) => (
-          <div key={index} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs w-full">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{card.title}</p>
-            <p className={`text-3xl font-black ${card.color} mt-2`}>{card.value}</p>
-          </div>
-        ))}
+        <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs w-full">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Audits</p>
+          <p className="text-3xl font-black text-indigo-600 mt-2">{audits}</p>
+        </div>
+
+        <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs w-full">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Average ATS Score</p>
+          <p className="text-3xl font-black text-emerald-600 mt-2">{avgScore}%</p>
+        </div>
+
+        <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs w-full">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Missing Technical Keywords</p>
+          <p className="text-3xl font-black text-amber-500 mt-2">{missingCount}</p>
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import {
   ArrowRight, Brain, Sparkles, ChevronRight, Briefcase 
 } from 'lucide-react';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function Register() {
@@ -18,6 +18,7 @@ export default function Register() {
 
     const [showPassword, setshowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     // 2. Simple handler updates state when you type
     const handleChange = (e) => {
@@ -44,10 +45,16 @@ export default function Register() {
                 password: formData.password
             };
             const res = await axios.post('http://localhost:8080/api/auth/register', userData);
+
+            localStorage.setItem("username", formData.fullName);
+            localStorage.setItem("isAuthenticated", "true");
+
             alert(res.data);
             setformData({
                 fullName: '', email: '', password: '', confirmPassword: ''
             });
+
+            navigate('/');
         }
         catch(error){
             console.error("Registration error: ",error);
