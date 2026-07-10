@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+
 
 import com.analyzer.entity.Resume;
 import com.analyzer.service.ResumeService;
@@ -38,7 +38,8 @@ public class ResumeController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadResume(
         @RequestParam("file") MultipartFile file,
-        @RequestParam("jobDescription") String jobDescription) {
+        @RequestParam("jobDescription") String jobDescription,
+        @RequestParam("userId") Long userId) {
         // Validate presence
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please select a valid file to upload.");
@@ -58,13 +59,14 @@ public class ResumeController {
         try {
             // Hand off execution responsibility to Service business layers
             //AnalysisResult metricsResult = resumeService.saveAndProcessResume(file, jobDescription);
-            AiAnalysisResponse aiMetrics = resumeService.saveAndProcessResume(file, jobDescription);
+            AiAnalysisResponse aiMetrics = resumeService.saveAndProcessResume(file, jobDescription, userId);
         
             // Return the calculation dataset payload as a JSON object directly to React
             // return ResponseEntity.ok(metricsResult);
             return ResponseEntity.ok(aiMetrics);
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Processing pipeline failure occurred: " + e.getMessage());
         }
@@ -72,10 +74,10 @@ public class ResumeController {
 
     // NEW HISTORICAL RECORDS ROUTE
     @GetMapping("/history")
-    public ResponseEntity<List<Resume>> getHistory(){
+public ResponseEntity<List<Resume>> getHistoryLogs(@RequestParam Long userId){
         try{
-            List<Resume> historyList = resumeService.getHistoryLogs();
-            return ResponseEntity.ok(historyList);
+            List<Resume> userResumes = resumeService.getHistoryLogsByUserId(userId);
+            return ResponseEntity.ok(userResumes);
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

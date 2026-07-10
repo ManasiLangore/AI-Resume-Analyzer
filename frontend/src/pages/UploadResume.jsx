@@ -27,9 +27,11 @@ export default function UploadResume({ onAnalysisComplete }) {
     setMessage("");
     onAnalysisComplete(null); // Clear previous results on new submission
 
+    const userId = localStorage.getItem("userId");
     const formData = new FormData();
     formData.append("file", file);
     formData.append("jobDescription", jobDescription);
+    formData.append("userId", userId);
 
     try {
       const response = await axios.post("http://localhost:8080/api/resumes/upload", formData, {

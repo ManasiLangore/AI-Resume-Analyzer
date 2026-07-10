@@ -35,10 +35,18 @@ export default function Login() {
     try{
       //Send login data to Spring boot
       const res = await axios.post('http://localhost:8080/api/auth/login', formData);
-      alert(res.data);
+      
 
-      localStorage.setItem("isAuthenticated", "true");
-      navigate('/dashboard')
+      if (res.data && res.data.id) {
+        localStorage.setItem("userId", res.data.id); 
+        localStorage.setItem("username", res.data.fullName); 
+        localStorage.setItem("isAuthenticated", "true");
+      
+        navigate("/dashboard"); // Redirect to dashboard workspace
+      }
+      else {
+        alert("Login response data is missing user identity tracking fields.");
+      }
     }
     catch(error){
       console.error("Login Error:", error);

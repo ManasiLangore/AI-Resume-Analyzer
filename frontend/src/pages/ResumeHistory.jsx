@@ -7,9 +7,11 @@ export default function ResumeHistory() {
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(null);
 
+  const userId = localStorage.getItem("userId");
+
   const fetchHistory = () => {
     setLoading(true);
-    axios.get("http://localhost:8080/api/resumes/history")
+    axios.get(`http://localhost:8080/api/resumes/history?userId=${userId}`)
       .then(response => {
         setHistory(response.data);
         setLoading(false);

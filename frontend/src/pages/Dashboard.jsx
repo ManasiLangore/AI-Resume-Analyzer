@@ -37,8 +37,16 @@ export default function Dashboard() {
   }, []);
 
   // Fetch metrics data from database
+  
   const fetchDashboardData = () => {
-    axios.get("http://localhost:8080/api/resumes/history")
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      console.warn("No user ID found in session storage.");
+      return;
+    }
+    
+    axios.get(`http://localhost:8080/api/resumes/history?userId=${userId}`)
       .then(response => {
         setHistory(response.data);
         setLoading(false);

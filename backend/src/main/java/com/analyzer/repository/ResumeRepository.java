@@ -7,4 +7,6 @@ import com.analyzer.entity.Resume;
 
 public interface ResumeRepository extends JpaRepository<Resume, Long>{
     List<Resume> findAllByOrderByUploadTimeDesc();
+
+    List<Resume> findByUserId(Long userId);
 }

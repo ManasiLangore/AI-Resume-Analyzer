@@ -1,7 +1,9 @@
 package com.analyzer.service;
 
 import com.analyzer.entity.Resume;
+import com.analyzer.entity.User;
 import com.analyzer.repository.ResumeRepository;
+import com.analyzer.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,9 @@ public class ResumeService {
     private ResumeRepository resumeRepo;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private FileTextExtractor fileTextExtractor;
 
     @Autowired
@@ -28,7 +33,11 @@ public class ResumeService {
 
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
 
-    public AiAnalysisResponse saveAndProcessResume(MultipartFile file, String jobDescription) throws IOException{
+    public AiAnalysisResponse saveAndProcessResume(MultipartFile file, String jobDescription, Long userId) throws IOException{
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Logged-in user profile not found in database session"));
+
         // Ensure folder directory infrastructure setup matches target specifications
         File directory = new File(UPLOAD_DIR);
         if(!directory.exists()){
@@ -72,6 +81,8 @@ public class ResumeService {
         resumeRecord.setMissingSkills(String.join(", ", aiMetrics.getMissingSkills()));
         resumeRecord.setOptimizationSuggestions(String.join(", ", aiMetrics.getOptimizationSuggestions()));
 
+        resumeRecord.setUser(currentUser);
+
         resumeRepo.save(resumeRecord);
         return aiMetrics;
 
@@ -83,6 +94,9 @@ public class ResumeService {
     // New Service support wrapper method to query historical rows
     public List<Resume> getHistoryLogs() {
         return resumeRepo.findAllByOrderByUploadTimeDesc();
+    }
+    public List<Resume> getHistoryLogsByUserId(Long userId) {
+        return resumeRepo.findByUserId(userId);
     }
 
     //to delete specific record histroy
