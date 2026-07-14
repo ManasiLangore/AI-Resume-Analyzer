@@ -26,14 +26,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User loginRequest){
-        String result = userserv.verifyUserLogin(loginRequest.getEmail(), loginRequest.getPassword());
+    public ResponseEntity<?> loginUser(@RequestBody User loginRequest){
+        User user = userserv.verifyUserLogin(loginRequest.getEmail(), loginRequest.getPassword());
 
-        if(result.startsWith("Login successful")){
-            return ResponseEntity.ok(result);
+        // if(result.startsWith("Login successful")){
+        //     return ResponseEntity.ok(result);
+        // }
+        if (user != null) {
+            return ResponseEntity.ok(user);
         }
         else{
-            return ResponseEntity.status(401).body(result);
+            return ResponseEntity.status(401).body("Invalid email or password!");
         }
     }
 }

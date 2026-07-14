@@ -36,6 +36,8 @@ export default function Login() {
       //Send login data to Spring boot
       const res = await axios.post('http://localhost:8080/api/auth/login', formData);
       
+      //console.log("Backend response payload:", res.data);
+      const userData = res.data;
 
       if (res.data && res.data.id) {
         localStorage.setItem("userId", res.data.id); 

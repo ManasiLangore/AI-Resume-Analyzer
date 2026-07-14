@@ -19,22 +19,26 @@ public class UserService {
     }
 
     // New Login verification method
-    public String verifyUserLogin(String email, String password){
+    public User verifyUserLogin(String email, String password){
         Optional<User> existingUser = userRepo.findAll().stream()
             .filter(u -> u.getEmail().equalsIgnoreCase(email))
             .findFirst();
 
         if(existingUser.isEmpty()){
-            return "User not found with this email!";
+            //return "User not found with this email!";
+            return null;
         }
         
         User user = existingUser.get();
 
         if(user.getPassword().equals(password)){
-            return "Login successful! Welcome back "+ user.getFullName();
+            //return "Login successful! Welcome back "+ user.getFullName();
+            return user;
         }
         else{
-            return "Incorrect password! Please try again.";
+            //return "Incorrect password! Please try again.";
+            return null;
         }
     }
+    
 }
