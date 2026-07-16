@@ -53,8 +53,8 @@ An intelligent, full-stack web application that allows users to upload their res
            ├── LandingPage.jsx
            ├── ResumeHistory.jsx
            └── UploadResume.jsx
-        
-⚡ Quick Start & Installation Guide
+
+##⚡ Quick Start & Installation Guide
 Prerequisites
 Java Development Kit (JDK 17 or higher)
 
