@@ -27,6 +27,31 @@ An intelligent, full-stack web application that allows users to upload their res
 *   **HTTP Architecture:** Axios Client
 *   **Styling Engine:** Custom Responsive CSS3 Modules
 
+
+---
+
+## 📸 Application Preview
+
+### 🌐 Landing Page
+
+![Landing Page](screenshots/landing-page.png)
+
+### 📊 Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### 📄 Upload Resume
+
+![Upload Resume](screenshots/upload-resume.png)
+
+### 🤖 AI Analysis
+
+![AI Analysis](screenshots/ai-analysis.png)
+
+### 📁 Resume History
+
+![Resume History](screenshots/resume-history.png)
+
 ---
 
 ## 📁 System Architecture & Directory Blueprint
